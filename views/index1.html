@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="text" id = "ipt"/>
+    <button onclick="search()">查询</button>
+    <div>
+        <h3 id = "id"></h3>
+        <h4 id = "name"></h4>
+    </div>
+    <script>
+
+        function search(){
+            var ipt = document.getElementById("ipt").value;
+            getData(ipt)
+        }
+
+        function getData(id){
+            // 创建一个对象
+            // 用js来控制进行HTTP请求
+            var xhr = new XMLHttpRequest()
+            xhr.open("get", "/data?id="+id)
+            // tcp握手
+            // readyState 0(请求未初始化) 1(服务器连接已建立) 2(请求已接受) 3(请求处理中) 4(请求已完成，且响应已就绪)
+            // Status
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // console.log(xhr.responseText)
+                    var obj = JSON.parse(xhr.responseText) // 把json格式的字符串 变成json
+                    console.log(obj)
+                    // 浏览器 解析内容
+                    document.getElementById("id").innerHTML = "id====>" + obj.ID
+                    document.getElementById("name").innerHTML = "name===>" + obj.Name
+                }
+            };
+            xhr.send(null) // 发送http://null---body 里不携带数据 header-body
+            }
+        
+    </script>
+</body>
+</html>

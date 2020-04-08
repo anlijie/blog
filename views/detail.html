@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>detail</title>
+</head>
+<body>
+    <a href="/list">返回列表</a>
+    <div>
+        <h2 id = "title">标题</h2>
+        <h3 id = "author">作者</h3>
+        <h4 id = "content">内容</h4>
+    </div>
+    <script src="/static/jquery.min.js"></script>
+    <script>
+        function init(){
+            var id = location.search.replace("?id=","")
+            $.get("/api/index/data", { id: id }, function(resp){
+                console.log(resp);
+                $("#title").html(resp.title);
+                $("#author").html(resp.author);
+                $("#content").html(resp.content);
+            });
+        }
+        init();
+    </script>
+</body>
+</html>

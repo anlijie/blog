@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/layui/layui/css/layui.css">
+    <title>Document</title>
+    <style>
+        ul {
+            list-style: none;
+        }
+        ul li {
+            display: table;
+            cursor: pointer;
+            height: 28px;
+            border-bottom: 1px solid #fff;
+        }
+        ul li:hover {
+            border-bottom: 1px solid #123;
+        }
+        ul li button,.add {
+            border: none;
+            color: #fff;
+            background-color: coral;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <a href="/add" class="add">添加</a>
+    <ul id="ctn">
+        <li><b>标题</b><span>[标题]</span><b>作者</b><span>[作者]</span><button onclick="del(id)">删除</button></li>
+    </ul>
+    <div id="page"></div>
+    <script id="test" type="text/html">
+            {{each items item key}}
+                <!-- <li>索引 {{i + 1}} ：{{value}}</li> -->
+                <li>[{{item.id}}]<b>标题</b><span>[{{item.title}}｝}]</span><b>作者</b><span>[{{item.author}}}]</span><button onclick="del({{item.id}})">删除</button><button onclick = "goEdit({{item.id}})">修改</button>&ensp;<a href = "/detail?id={{item.id}}">查看</a></li>
+            {{/each}}
+    </script>
+    <script src="/static/jquery.min.js"></script>
+    <script src="/static/template-web.js"></script>
+    <script src="/static/layui/layui/layui.all.js"></script>
+    <script>
+        var layer = layui.layer, // 弹出层
+        form = layui.form;       // 表单
+        var laypage = layui.laypage;// 分页
+  
+        function init(pi, ps){
+            $.get("/api/article/page", {pi : pi, ps : ps}, function(resp){
+                if (resp.code == 200) {
+                    // var data={
+                    //     resp:resp
+                    // }
+                    var html = template("test", resp.data)
+                    $("#ctn").html(html);
+
+                    //执行一个laypage实例
+                    laypage.render({
+                        elem: 'page', //注意，这里的 test1 是 ID，不用加 # 号
+                        count: resp.data.count, //数据总数，从服务端得到
+                        limit: ps,   // 每一页的大小
+                        curr: pi,    // 当前页
+                        layout : ['prev', 'page', 'next', 'count', 'skip', 'refresh', 'limit'],
+                        limits : [10, 20, 30, 40, 50],
+                        jump: function(obj, first){
+                            //obj包含了当前分页的所有参数，比如：
+                            console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+                            console.log(obj.limit); //得到每页显示的条数
+                            
+                            //首次不执行
+                            if(!first){
+                            //do something
+                                init(obj.curr, obj.limit);
+                            }
+                        }
+                    });
+                } else {
+                    alter(resp.msg);
+                }
+            }, 'json');
+        }
+        function del(id){
+            $.get("/api/list/del", {id: id}, function(resp){
+                alert(resp)
+                if (resp.code == 200) {
+                    init(1, 8);
+                } else {
+                    alert(resp.msg)
+                }
+            })
+        }
+        function goEdit(id){
+            window.location.href = "/edit?id=" + id;
+        }
+        init(1, 8);
+    </script>
+</body>
+</html>
